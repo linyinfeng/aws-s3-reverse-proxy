@@ -184,11 +184,15 @@ func (h *Handler) assembleUpstreamReq(signer *v4.Signer, req *http.Request, regi
 	if err != nil {
 		return nil, err
 	}
-	if val, ok := req.Header["Content-Type"]; ok {
-		proxyReq.Header["Content-Type"] = val
-	}
-	if val, ok := req.Header["Content-Md5"]; ok {
-		proxyReq.Header["Content-Md5"] = val
+	// Copy signed headers except host
+	authorizationHeader := req.Header.Get("authorization")
+	match := awsAuthorizationSignedHeadersRegexp.FindStringSubmatch(authorizationHeader)
+	if len(match) == 2 {
+		for _, header := range strings.Split(match[1], ";") {
+			if header != "host" {
+			    proxyReq.Header.Set(header, req.Header.Get(header))
+			}
+		}
 	}
 
 	// Sign the upstream request
