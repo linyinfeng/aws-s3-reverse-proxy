@@ -190,7 +190,7 @@ func (h *Handler) assembleUpstreamReq(signer *v4.Signer, req *http.Request, regi
 	if len(match) == 2 {
 		for _, header := range strings.Split(match[1], ";") {
 			if header != "host" {
-			    proxyReq.Header.Set(header, req.Header.Get(header))
+				proxyReq.Header.Set(header, req.Header.Get(header))
 			}
 		}
 	}
